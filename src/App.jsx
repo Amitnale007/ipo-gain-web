@@ -72,9 +72,9 @@ function App() {
   const total = latestResult?.ipo_count ?? analyses.length;
   const averageScore = analyses.length
     ? Math.round(
-        analyses.reduce((sum, ipo) => sum + (Number(ipo.overall_score) || 0), 0)
-        / analyses.length
-      )
+      analyses.reduce((sum, ipo) => sum + (Number(ipo.overall_score) || 0), 0)
+      / analyses.length
+    )
     : 0;
   const bestIPO = [...analyses].sort(
     (a, b) => (b.overall_score ?? 0) - (a.overall_score ?? 0)
@@ -266,13 +266,12 @@ function App() {
                           <p className="text-2xl font-extrabold">{ipo.overall_score ?? '—'}</p>
                           <p className="text-[10px] font-bold uppercase tracking-wider">Score / 100</p>
                         </div>
-                        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                          ipo.recommendation?.toLowerCase() === 'apply'
+                        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${ipo.recommendation?.toLowerCase() === 'apply'
                             ? 'bg-emerald-50 text-emerald-700'
                             : ipo.recommendation?.toLowerCase() === 'avoid'
                               ? 'bg-rose-50 text-rose-700'
                               : 'bg-amber-50 text-amber-700'
-                        }`}>
+                          }`}>
                           {ipo.recommendation ?? 'Not rated'}
                         </span>
                       </div>
@@ -398,25 +397,57 @@ function App() {
                           </div>
                         </div>
 
+
                         {ipo.sources?.length > 0 && (
                           <div>
                             <h4 className="mb-2 font-bold">Research sources</h4>
+
                             <div className="flex flex-wrap gap-2">
-                              {ipo.sources.map((url) => (
-                                <a
-                                  key={url}
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex max-w-full items-center gap-2 break-all rounded-lg border border-slate-200 px-3 py-2 text-xs text-indigo-700 hover:bg-indigo-50"
-                                >
-                                  <ExternalLink size={14} className="shrink-0" />
-                                  {new URL(url).hostname}
-                                </a>
-                              ))}
+                              {ipo.sources.map((source, index) => {
+                                const rawUrl =
+                                  typeof source === 'string'
+                                    ? source.trim()
+                                    : '';
+
+                                let validUrl = null;
+
+                                try {
+                                  const parsedUrl = new URL(
+                                    /^https?:\/\//i.test(rawUrl)
+                                      ? rawUrl
+                                      : `https://${rawUrl}`
+                                  );
+
+                                  if (
+                                    ['http:', 'https:'].includes(parsedUrl.protocol) &&
+                                    parsedUrl.hostname.includes('.')
+                                  ) {
+                                    validUrl = parsedUrl.href;
+                                  }
+                                } catch {
+                                  validUrl = null;
+                                }
+
+                                return (
+                                  <a
+                                    key={`${rawUrl}-${index}`}
+                                    href={validUrl || undefined}
+                                    target={validUrl ? '_blank' : undefined}
+                                    rel={validUrl ? 'noopener noreferrer' : undefined}
+                                    onClick={!validUrl ? (e) => e.preventDefault() : undefined}
+                                    className="inline-flex max-w-full items-center gap-2 break-all rounded-lg border border-slate-200 px-3 py-2 text-xs text-indigo-700 hover:bg-indigo-50"
+                                  >
+                                    <ExternalLink size={14} className="shrink-0" />
+                                    {validUrl
+                                      ? new URL(validUrl).hostname
+                                      : rawUrl || 'Invalid source URL'}
+                                  </a>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
+
                       </div>
                     )}
                   </div>
