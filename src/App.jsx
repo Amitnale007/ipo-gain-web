@@ -231,11 +231,15 @@ function App() {
             {analyses.map((ipo) => {
               const isExpanded = expanded === ipo.key;
               const breakdown = ipo.score_breakdown ?? {};
+              const isLastDay = ipo.close_date === date;
 
               return (
                 <article
                   key={ipo.key}
-                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+                  className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md ${isLastDay
+                      ? 'border-rose-400 ring-2 ring-rose-200'
+                      : 'border-slate-200'
+                    }`}
                 >
                   <div className="p-5 sm:p-6">
                     <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
@@ -260,6 +264,12 @@ function App() {
                           </div>
                         </div>
                       </div>
+                      {isLastDay && (
+  <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-700">
+    <CalendarDays size={14} />
+    LAST DAY TO APPLY
+  </span>
+)}
 
                       <div className="flex flex-wrap items-center gap-3 lg:justify-end">
                         <div className={`rounded-xl px-4 py-3 text-center ${scoreColor(ipo.overall_score)}`}>
@@ -267,10 +277,10 @@ function App() {
                           <p className="text-[10px] font-bold uppercase tracking-wider">Score / 100</p>
                         </div>
                         <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${ipo.recommendation?.toLowerCase() === 'apply'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : ipo.recommendation?.toLowerCase() === 'avoid'
-                              ? 'bg-rose-50 text-rose-700'
-                              : 'bg-amber-50 text-amber-700'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : ipo.recommendation?.toLowerCase() === 'avoid'
+                            ? 'bg-rose-50 text-rose-700'
+                            : 'bg-amber-50 text-amber-700'
                           }`}>
                           {ipo.recommendation ?? 'Not rated'}
                         </span>
